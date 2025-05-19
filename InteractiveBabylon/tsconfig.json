@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "/*" : ["src/*"],
+      "test/*" : ["test/*"]
+    },
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noResolve": false,
+    "sourceMap": true,
+    "noEmit": true,
+    "preserveConstEnums": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "noImplicitOverride": true
+  },
+  "include": [
+    "src",
+    "src/**/*.ts",
+    "./src"
+  ]
+}

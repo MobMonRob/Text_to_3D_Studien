@@ -1,0 +1,310 @@
+classDiagram
+    direction LR
+
+    class App {
+        +constructor()
+        -createCanvas() HTMLCanvasElement
+        -createWorldManager(engine: Engine, canvas: HTMLCanvasElement) Promise~WorldManager~
+    }
+
+    class Scene {
+        <<BabylonJS>>
+        %% Defined in @babylonjs/core
+        +constructor(engine: Engine)
+        +addCamera(camera: Camera) void
+        +addMesh(mesh: AbstractMesh, recursive?: boolean) void
+        +render() void
+        +debugLayer: DebugLayer
+        +environmentTexture: Nullable~BaseTexture~
+        +ambientColor: Color3
+        +clearColor: Color4
+        +stopAnimation(target: any) Scene
+        +beginDirectAnimation(target: any, animations: Animation[], from: number, to: number, loop?: boolean, speedRatio?: number, onAnimationEnd?: () => void) Animatable
+    }
+
+    class World {
+        <<Entity>>
+        -sky: Sky
+        -terrain: Terrain
+        +constructor(engine: Engine, canvas: HTMLCanvasElement)
+        #createCamera(canvas: HTMLCanvasElement) void
+        #createLight() void
+        #createSky() void
+        #createTerrain() void
+        #createUserInterface() void
+        +placeModel(model: ReflectingMesh~AbstractMesh~, position?: Vector3, rotation?: Vector3, includeChildMeshes?: boolean) World
+        #loadDefaultScene() void
+    }
+    World --|> Scene
+
+    class StudioWorld {
+        <<Entity>>
+        +constructor(engine: Engine, canvas: HTMLCanvasElement)
+        +createSky() void
+        +createLight() void
+        +createTerrain() void
+        +loadDefaultScene() void
+    }
+    StudioWorld --|> World
+
+    class WorldInsight {
+        <<Entity>>
+        +createView(scene: Scene, initialOrientation?: Vector3, cameraName?: string) Camera
+    }
+
+    class Terrain {
+        <<Entity>>
+        -groundTexture: Texture
+        -groundMaterial: PBRMaterial
+        -ground: ReflectingMesh~GroundMesh~
+        -waterMaterial: WaterMaterial
+        -water: ReflectingMesh~GroundMesh~
+        +constructor(scene: Scene, name?: string)
+        -createWater(scene: Scene, name?: string) void
+        +GetGroundMesh() ReflectingMesh~GroundMesh~
+        +GetWaterMesh() ReflectingMesh~GroundMesh~
+    }
+
+    class ReflectingMesh~T~ {
+        <<Entity>>
+        +mesh: T
+        +reflectionProbe: ReflectionProbe
+        +pbrMaterial: PBRMaterial
+        +originalMaterial: Nullable~Material~
+        +constructor(mesh: T, scene: Scene, name?: string, reflectionProbeSize?: number, initialColor?: Color3)
+        +shouldReflect(meshesToReflect: AbstractMesh[]) void
+        +dispose(restoreOriginalMaterial?: boolean) void
+    }
+    ReflectingMesh --|> AbstractMesh : T extends
+
+    class Sky {
+        <<Entity>>
+        -skyMaterial: SkyMaterial
+        -skyBox: Mesh
+        %% Potential, commented out in source
+        #skyMesh: ReflectingMesh~Mesh~
+        +constructor(scene: Scene, name?: string)
+        +getSkyBox() Mesh
+        %% Changed SkyConfigParameter to string for simplicity
+        +setSkyConfig(property: string, from: number, to: number) void
+        +setMorning() void
+        +setDay() void
+        +setEvening() void
+        +setNight() void
+    }
+
+    class WorldManager {
+        <<Entity>>
+        -engine: Engine
+        -canvas: HTMLCanvasElement
+        -sceneFactories: Map~string, SceneFactory~
+        -activeScene: Nullable~Scene~
+        +constructor(engine: Engine, canvas: HTMLCanvasElement)
+        +registerWorld(name: string, factory: SceneFactory) void
+        +switchToScene(name: string) Promise~Scene~
+        +getActiveScene() Nullable~Scene~
+        +disposeScene(name: string) void
+        +disposeAllScenes() void
+    }
+    WorldManager ..> SceneFactory : uses
+    WorldManager o-- Engine
+    WorldManager o-- HTMLCanvasElement
+    WorldManager "1" *-- "0..*" Scene : manages >
+
+    class SceneFactory {
+        <<Type Alias>>
+        (engine: Engine, canvas: HTMLCanvasElement) => Scene
+    }
+
+    class ModelLoader {
+        <<Infrastructure>>
+        %% Changed URL | string to string
+        +loadGlbModelTo(scene: Scene, modelSource: string, position?: Vector3, scaleFactor?: number) Promise~Mesh[]~
+        +applyPBRMaterialToMeshes(pbrMaterial: PBRMaterial, meshes: AbstractMesh[], receiveRealtimeShadows?: boolean) Promise~void~
+        %% Changed GradioOutput to any
+        #saveModelAsFile(output: any, filename?: string) Promise~void~
+    }
+
+    class OpenAiRealtimeAudioService {
+        <<Infrastructure>>
+        %% Changed OpenAIRealtimeWS to any
+        -realtimeSocket: any
+        %% Changed OpenAIRealtimeWS to any
+        +constructor(socket: any)
+        +registerSocketEvent(event: string, callback: (...args: any[]) => void) void
+        %% Changed ResponseTextDeltaEvent to any
+        +registerOnTextStream(callback: (event: any) => void) void
+        %% Changed ResponseAudioDeltaEvent to any
+        +registerOnAudioStream(callback?: (event: any) => void) void
+        +registerOnEndOfResponse(callback: () => void) void
+    }
+
+    class LanguageModelBackend {
+        <<Infrastructure>>
+        %% Changed OpenAI | AzureOpenAI to any
+        -client: any
+        %% Changed OpenAI | AzureOpenAI to any
+        +constructor(client: any)
+        %% Simplified message type
+        +getChatCompletion(messages: Array~object~, model?: string, temperature?: number, top_p?: number, maxTokens?: number) Promise~string~
+        +getAvailableModels() Promise~string[]~
+    }
+
+    class OpenAiClientBuilder {
+        <<Infrastructure>>
+        %% Placeholder - No methods/properties shown in snippet
+    }
+
+    class AssetCreatorView {
+        <<Presentation>>
+        %% Placeholder - No methods/properties shown in snippet
+    }
+
+    class ToolbarView {
+        <<Presentation>>
+        %% Inferred from World.createUserInterface
+        +constructor(scene: Scene)
+    }
+
+    class AbstractView {
+        <<Presentation>>
+        %% Placeholder - No methods/properties shown in snippet
+    }
+
+    class WorldManipulation {
+        <<Entity>>
+        %% Placeholder - Empty class
+    }
+
+    class TimeSlice {
+        <<Entity>>
+        %% Placeholder - Empty class
+    }
+
+    class UnifiedModel<T> {
+        <<Entity>>
+        -mesh: T
+        -probe: ReflectionProbe
+        +constructor(mesh: T, scene: Scene, name?: string, material?: Material, ownReflectionProbe?: ReflectionProbe)
+        +shouldReflect(mesh: AbstractMesh) Promise~void~
+        +shouldReflectAll(meshes: AbstractMesh[]) Promise~void~
+        +shouldReflectEachOther(models: UnifiedModel~AbstractMesh~[]) Promise~void~
+    }
+    UnifiedModel --|> AbstractMesh : T extends
+
+    %% Relationships
+    App ..> WorldManager : creates/uses
+    App ..> World : creates/uses
+    App ..> Engine : uses
+    World *-- Sky : contains
+    World *-- Terrain : contains
+    World ..> WorldInsight : uses
+    World ..> ToolbarView : creates
+    World ..> ReflectingMesh : uses
+    World ..> HemisphericLight : uses
+    World ..> Vector3 : uses
+    World ..> PBRMaterial : uses
+    World ..> ReflectionProbe : uses
+    World ..> MeshBuilder : uses
+    Terrain *-- "2" ReflectingMesh : contains ground, water
+    Terrain ..> Texture : uses
+    Terrain ..> PBRMaterial : uses
+    Terrain ..> WaterMaterial : uses
+    Terrain ..> MeshBuilder : uses
+    Terrain ..> Vector2 : uses
+    Sky ..> SkyMaterial : uses
+    Sky ..> Mesh : uses
+    Sky ..> MeshBuilder : uses
+    Sky ..> ReflectionProbe : uses
+    Sky ..> Animation : uses
+    %% potentially
+    Sky ..> ReflectingMesh : uses
+    WorldInsight ..> Camera : creates/returns
+    %% potentially
+    WorldInsight ..> FlyCamera : uses
+    WorldInsight ..> Vector3 : uses
+    ReflectingMesh ..> ReflectionProbe : uses/creates
+    ReflectingMesh ..> PBRMaterial : uses/creates
+    ReflectingMesh ..> Material : uses
+    ReflectingMesh ..> Color3 : uses
+    WorldManager ..> StudioWorld : creates/uses
+    StudioWorld ..> Color3 : uses
+    StudioWorld ..> StandardMaterial : uses
+    StudioWorld ..> MeshBuilder : uses
+    StudioWorld ..> Color4 : uses
+    StudioWorld ..> HemisphericLight : uses
+    StudioWorld ..> Vector3 : uses
+    ModelLoader ..> Scene : uses
+    ModelLoader ..> AbstractMesh : uses
+    ModelLoader ..> PBRMaterial : uses
+    ModelLoader ..> ReflectionProbe : uses
+    %% Changed from ImportMeshAsync
+    ModelLoader ..> SceneLoader : uses
+    ModelLoader ..> Vector3 : uses
+    ModelLoader ..> Mesh : uses
+    OpenAiRealtimeAudioService ..> "any (OpenAIRealtimeWS)" : uses
+    OpenAiRealtimeAudioService ..> Buffer : uses
+    LanguageModelBackend ..> "any (OpenAI | AzureOpenAI)" : uses
+    %% likely
+    OpenAiClientBuilder ..> "any (OpenAI)" : uses
+    %% likely
+    OpenAiClientBuilder ..> "any (AzureOpenAI)" : uses
+    %% likely
+    OpenAiClientBuilder ..> "any (ClientOptions)" : uses
+    AssetCreatorView ..> GUI : uses
+    AssetCreatorView ..> Scene : uses
+    AssetCreatorView ..> ToolbarView : uses
+    AssetCreatorView ..> "any (GradioServiceFactory)" : uses
+    AssetCreatorView ..> "any (TrellisService)" : uses
+    UnifiedModel ..> ReflectionProbe : uses/creates
+    UnifiedModel ..> PBRMaterial : uses/creates
+    UnifiedModel ..> StandardMaterial : uses/creates
+    UnifiedModel ..> Material : uses
+    UnifiedModel ..> FresnelParameters : uses
+    UnifiedModel ..> RandomGUID : uses
+
+    %% External/Library classes (simplified representation)
+    class Engine { <<BabylonJS>> }
+    class Camera { <<BabylonJS>> }
+    class FlyCamera { <<BabylonJS>> }
+    class AbstractMesh { <<BabylonJS>> }
+    class Mesh { <<BabylonJS>> }
+    class GroundMesh { <<BabylonJS>> }
+    class Vector3 { <<BabylonJS>> }
+    class Vector2 { <<BabylonJS>> }
+    class Color3 { <<BabylonJS>> }
+    class Color4 { <<BabylonJS>> }
+    class Texture { <<BabylonJS>> }
+    class BaseTexture { <<BabylonJS>> }
+    class Material { <<BabylonJS>> }
+    class PBRMaterial { <<BabylonJS>> }
+    class StandardMaterial { <<BabylonJS>> }
+    class WaterMaterial { <<BabylonJS Material>> }
+    class SkyMaterial { <<BabylonJS Material>> }
+    class HemisphericLight { <<BabylonJS>> }
+    class PointLight { <<BabylonJS>> }
+    class ReflectionProbe { <<BabylonJS>> }
+    class Animation { <<BabylonJS>> }
+    class Animatable { <<BabylonJS>> }
+    class MeshBuilder { <<BabylonJS>> }
+    %% Changed from ImportMeshAsync
+    class SceneLoader { <<BabylonJS>> }
+    class DebugLayer { <<BabylonJS>> }
+    class GUI { <<BabylonJS GUI>> }
+    class Buffer { <<NodeJS>> }
+    class FresnelParameters { <<BabylonJS>> }
+    class RandomGUID { <<BabylonJS>> }
+
+    %% External types represented as strings or 'any' for simplicity in diagram
+    class "Promise<T>" { <<Generic>> }
+    class "Nullable<T>" { <<Generic>> }
+    class "Map<K, V>" { <<Generic>> }
+    class "Array<T>" { <<Generic>> }
+    class "any (OpenAIRealtimeWS)" { <<External>> }
+    class "any (OpenAI | AzureOpenAI)" { <<External>> }
+    class "any (ClientOptions)" { <<External>> }
+    class "any (ResponseTextDeltaEvent)" { <<External>> }
+    class "any (ResponseAudioDeltaEvent)" { <<External>> }
+    class "any (GradioServiceFactory)" { <<External>> }
+    class "any (TrellisService)" { <<External>> }
+    class "any (GradioOutput)" { <<External>> }

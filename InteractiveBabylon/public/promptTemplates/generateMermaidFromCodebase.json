@@ -1,0 +1,5 @@
+[
+    "Kommentare nur in eigenen Zeilen mit %% als Prefix.",
+    "Generics in allen Fällen umformuliert von <T> nach ~T~",
+    "Gib nur das Mermaid Diagramm aus, das der aktuellen Mermaid Definition entspricht."
+]

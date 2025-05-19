@@ -1,0 +1,30 @@
+{
+  "name": "interactivebabylon",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "debug": "vite -d",
+    "test": "vitest",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "help": "vite --help"
+  },
+  "devDependencies": {
+    "@babylonjs/gui": "^7.54.0",
+    "@babylonjs/inspector": "^7.54.0",
+    "@gradio/client": "^1.13.1",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^7.54.0",
+    "@babylonjs/materials": "^7.54.0",
+    "@google/genai": "^0.13.0",
+    "@types/cytoscape": "^3.21.9",
+    "cytoscape": "^3.31.2",
+    "mime": "^4.0.7"
+  }
+}
